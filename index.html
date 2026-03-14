@@ -3,102 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PAYG WHEEL">
-    
-    <title>PAYG INSURE | iPad Kiosk Edition</title>
+    <title>PAYG INSURE | Kiosk Editor</title>
     <style>
-        :root {
-            --bg-dark: #020205;
-            --accent-pink: #FF007F;
-            --accent-blue: #00F2FF;
-            --text-white: #FFFFFF;
-        }
-
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-
+        :root { --bg-dark: #020205; --accent-pink: #FF007F; --accent-blue: #00F2FF; --text-white: #FFFFFF; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            margin: 0;
-            background-color: var(--bg-dark);
-            color: var(--text-white);
-            font-family: 'Inter', -apple-system, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            margin: 0; background-color: var(--bg-dark); color: var(--text-white);
+            font-family: 'Inter', -apple-system, sans-serif; display: flex;
+            justify-content: center; align-items: center; height: 100vh; overflow: hidden;
             background-image: radial-gradient(circle at 50% 50%, #0d0d2b 0%, #020205 100%);
-            
-            /* Запрет жестов iPad */
-            touch-action: none;
-            -webkit-user-select: none;
-            user-select: none;
+            touch-action: none; -webkit-user-select: none;
         }
 
-        .container { 
-            position: relative; text-align: center; z-index: 10; width: 100%;
-            display: flex; flex-direction: column; align-items: center;
-        }
-
-        .header h1 { 
-            font-size: 52px; margin: 0; letter-spacing: -1px; font-weight: 900; color: #FFFFFF;
-            text-shadow: 2px 2px 0px #000, -2px -2px 0px #000, 2px -2px 0px #000, -2px 2px 0px #000;
-        }
-
+        .container { position: relative; text-align: center; z-index: 10; width: 100%; display: flex; flex-direction: column; align-items: center; }
+        .header h1 { font-size: 52px; margin: 0; font-weight: 900; text-shadow: 2px 2px 0px #000; }
         .header p { color: var(--accent-pink); text-transform: uppercase; letter-spacing: 6px; font-size: 14px; margin: 8px 0 0; font-weight: 700; }
 
-        .wheel-outer {
-            position: relative; width: 620px; height: 620px; margin: 45px auto 0; 
-            animation: wheel-float 8s ease-in-out infinite;
-        }
-
-        @keyframes wheel-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
+        .wheel-outer { position: relative; width: 620px; height: 620px; margin: 40px auto 0; }
         .marker {
             position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
-            border-top: 45px solid #FFF; z-index: 30; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+            border-top: 45px solid #FFF; z-index: 30;
         }
-
         canvas { width: 100%; height: 100%; border-radius: 50%; border: 15px solid #000; transition: transform 6s cubic-bezier(0.1, 0, 0, 1); }
 
         .spin-btn {
             margin-top: 40px; background: var(--accent-pink); color: white; border: none; padding: 22px 100px;
-            font-size: 30px; font-weight: 900; border-radius: 100px; cursor: pointer;
-            box-shadow: 0 10px 30px rgba(255, 0, 127, 0.3); text-transform: uppercase; animation: btn-pulse 2.5s infinite; z-index: 20;
+            font-size: 30px; font-weight: 900; border-radius: 100px; cursor: pointer; text-transform: uppercase;
         }
+        .spin-btn:disabled { opacity: 0.3; }
 
-        @keyframes btn-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        .spin-btn:disabled { animation: none; background: #222; opacity: 0.5; cursor: default; }
+        .result-box { margin-top: 20px; height: 100px; }
+        .result-label { font-size: 36px; font-weight: 900; color: var(--accent-blue); display: none; text-transform: uppercase; }
 
-        .result-box { margin-top: 20px; height: 110px; }
-        .result-label { font-size: 38px; font-weight: 900; color: var(--accent-blue); display: none; animation: result-pop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49); text-transform: uppercase; }
+        /* Эдитор / Админка */
+        #adminPanel { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #0a0a10; z-index: 1000; display: none; flex-direction: column; 
+            padding: 40px; overflow-y: auto; -webkit-user-select: text;
+        }
+        .admin-nav { display: flex; gap: 20px; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .nav-btn { background: none; border: none; color: #666; font-size: 24px; cursor: pointer; font-weight: bold; }
+        .nav-btn.active { color: var(--accent-blue); border-bottom: 3px solid var(--accent-blue); }
 
-        #adminPanel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 2, 5, 0.99); z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 60px 40px; overflow-y: auto; }
-        .admin-header { width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid var(--accent-blue); padding-bottom: 15px;}
-        .admin-buttons { display: flex; gap: 15px; }
-        .export-btn { background: #28a745; color: white; border: none; padding: 15px 30px; cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 18px; }
-        .clear-btn { background: #dc3545; color: white; border: none; padding: 15px 30px; cursor: pointer; border-radius: 8px; font-weight: bold; font-size: 18px; }
-        .close-admin { background: none; border: 1px solid #555; color: #fff; padding: 15px 30px; cursor: pointer; border-radius: 8px; font-size: 18px; }
-        .history-table { width: 100%; max-width: 900px; border-collapse: collapse; margin-top: 20px; font-size: 20px; }
-        .history-table th { padding: 20px; text-align: left; background: #121218; color: var(--accent-blue); }
-        .history-table td { padding: 18px; border-bottom: 1px solid #1a1a1a; }
+        .editor-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .editor-row input { 
+            background: #1a1a25; border: 1px solid #333; color: white; padding: 12px; 
+            border-radius: 5px; font-size: 18px; 
+        }
+        .input-name { flex: 2; }
+        .input-chance { width: 80px; text-align: center; }
+        .del-btn { background: #dc3545; border: none; color: white; padding: 12px; border-radius: 5px; cursor: pointer; }
+        .add-btn { background: #28a745; border: none; color: white; padding: 15px; border-radius: 5px; margin-top: 20px; width: 100%; font-size: 18px; font-weight: bold; }
         
-        /* Скрытая кнопка админки в правом нижнем углу */
-        .settings-btn { position: fixed; bottom: 0; right: 0; width: 100px; height: 100px; background: transparent; border: none; cursor: pointer; z-index: 5; }
+        .save-bar { position: sticky; bottom: -40px; background: #0a0a10; padding: 20px 0; display: flex; gap: 10px; }
+        .btn-main { flex: 1; padding: 15px; border-radius: 8px; border: none; font-weight: bold; font-size: 18px; cursor: pointer; }
+
+        .settings-btn { position: fixed; bottom: 0; right: 0; width: 80px; height: 80px; background: transparent; border: none; z-index: 5; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>PAYG INSURE</h1>
-        <p>SAFE MODE ACTIVATED</p>
+        <h1 id="mainTitle">PAYG INSURE</h1>
+        <p id="subTitle">SAFE MODE ACTIVATED</p>
     </div>
     <div class="wheel-outer">
         <div class="marker"></div>
@@ -113,168 +85,189 @@
 <button class="settings-btn" id="openAdmin"></button>
 
 <div id="adminPanel">
-    <div class="admin-header">
-        <h2 style="color: var(--accent-blue); font-size: 32px;">РЕЗУЛЬТАТЫ</h2>
-        <div class="admin-buttons">
-            <button class="export-btn" id="exportCsv">💾 EXCEL</button>
-            <button class="clear-btn" id="clearTable">🗑️ ОЧИСТИТЬ</button>
-            <button class="close-admin" id="closeAdmin">ЗАКРЫТЬ</button>
+    <div class="admin-nav">
+        <button class="nav-btn active" onclick="showTab('tab-editor')">РЕДАКТОР КОЛЕСА</button>
+        <button class="nav-btn" onclick="showTab('tab-history')">ИСТОРИЯ</button>
+        <button class="nav-btn" style="margin-left: auto; color: #fff;" id="closeAdmin">✕</button>
+    </div>
+
+    <div id="tab-editor">
+        <div style="margin-bottom: 30px;">
+            <h3>ЗАГОЛОВКИ</h3>
+            <div class="editor-row">
+                <input type="text" id="editMainTitle" class="input-name" placeholder="Главный заголовок">
+                <input type="text" id="editSubTitle" class="input-name" placeholder="Подзаголовок">
+            </div>
+        </div>
+
+        <h3>СЕКТОРЫ (Название и % шанса)</h3>
+        <div id="sectorsList"></div>
+        <button class="add-btn" onclick="addSectorRow()">+ ДОБАВИТЬ СЕКТОР</button>
+        
+        <div class="save-bar">
+            <button class="btn-main" style="background: var(--accent-blue); color: #000;" onclick="saveSettings()">СОХРАНИТЬ И ОБНОВИТЬ</button>
         </div>
     </div>
-    <table class="history-table" id="historyTable">
-        <thead><tr><th>№</th><th>ВРЕМЯ</th><th>ПРИЗ</th></tr></thead>
-        <tbody></tbody>
-    </table>
+
+    <div id="tab-history" style="display:none;">
+        <div style="display:flex; gap:10px; margin-bottom: 20px;">
+            <button class="btn-main" style="background: #28a745; color: #fff;" id="exportCsv">EXCEL</button>
+            <button class="btn-main" style="background: #dc3545; color: #fff;" id="clearTable">ОЧИСТИТЬ ЛОГ</button>
+        </div>
+        <table style="width:100%; border-collapse: collapse;" id="historyTable">
+            <thead><tr style="text-align:left; color: var(--accent-blue);"><th>№</th><th>ВРЕМЯ</th><th>ПРИЗ</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>
 
 <script>
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
     const btn = document.getElementById('spinBtn');
-    const resultLabel = document.getElementById('resultLabel');
-    const prizeSpan = document.getElementById('prizeName');
-    const adminPanel = document.getElementById('adminPanel');
+    
+    // Начальные настройки (если в памяти пусто)
+    const defaultData = {
+        mainTitle: "PAYG INSURE",
+        subTitle: "SAFE MODE ACTIVATED",
+        prizes: [
+            { name: "ТЫЩА МИНУТ", chance: 5 },
+            { name: "СТИКЕРПАК", chance: 30 },
+            { name: "ПУТЬ ЗА НОЛЬ", chance: 20 },
+            { name: "ДВОЙНОЙ СЧЕТ", chance: 15 },
+            { name: "ЕЩЕ КРУЖОК", chance: 30 }
+        ]
+    };
 
+    let currentData = JSON.parse(localStorage.getItem('wheelConfig')) || defaultData;
     let isSpinning = false;
-    let lastHighlightedIndex = -1;
+    let totalRotation = 0;
+    let lastTickIndex = -1;
 
-    // --- AUDIO ---
+    // Звук
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     const audioCtx = new AudioCtx();
-
     function playTick() {
-        const osc = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(550, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.04);
-        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
-        osc.connect(g); g.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.04);
+        const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+        o.type = 'sine'; o.frequency.setValueAtTime(600, audioCtx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.04);
+        g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.connect(audioCtx.destination);
+        o.connect(g); o.start(); o.stop(audioCtx.currentTime + 0.04);
     }
-
-    function playWin() {
-        [523, 659, 783, 1046].forEach((f, i) => {
-            const o = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            o.frequency.setValueAtTime(f, audioCtx.currentTime + i * 0.1);
-            g.gain.setValueAtTime(0.1, audioCtx.currentTime + i * 0.1);
-            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.5);
-            o.connect(g); g.connect(audioCtx.destination);
-            o.start(audioCtx.currentTime + i * 0.1); o.stop(audioCtx.currentTime + i * 0.1 + 0.5);
-        });
-    }
-
-    const prizes = [
-        { name: "ТЫЩА МИНУТ", chance: 1 }, { name: "СТИКЕРПАК", chance: 35 },
-        { name: "ПУТЬ ЗА НОЛЬ", chance: 25 }, { name: "ДВОЙНОЙ СЧЕТ", chance: 10 },
-        { name: "ТВОЙ АМУЛЕТ", chance: 2 }, { name: "ДРУЖСКИЙ СЕЙВ", chance: 7 },
-        { name: "ЕЩЕ КРУЖОК", chance: 5 }, { name: "ДЕНЬ БЕЗ ГРАНИЦ", chance: 15 }
-    ];
-
-    const numSectors = prizes.length;
-    const arc = (2 * Math.PI) / numSectors;
 
     function draw() {
         const cx = 600, cy = 600, r = 580;
+        const num = currentData.prizes.length;
+        const arc = (2 * Math.PI) / num;
         ctx.clearRect(0,0,1200,1200);
 
-        const style = window.getComputedStyle(canvas);
-        const matrix = new WebKitCSSMatrix(style.transform);
-        const currentAngleRad = Math.atan2(matrix.b, matrix.a);
+        const matrix = new WebKitCSSMatrix(window.getComputedStyle(canvas).transform);
+        const currentAngle = Math.atan2(matrix.b, matrix.a);
 
-        prizes.forEach((p, i) => {
-            const startAngle = i * arc - (Math.PI / 2) - (arc / 2);
+        document.getElementById('mainTitle').textContent = currentData.mainTitle;
+        document.getElementById('subTitle').textContent = currentData.subTitle;
+
+        currentData.prizes.forEach((p, i) => {
+            const angle = i * arc - (Math.PI / 2) - (arc / 2);
             ctx.beginPath();
             ctx.fillStyle = (i % 2 === 0) ? "#08080A" : "#121218";
-            ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, startAngle, startAngle + arc); ctx.fill();
+            ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, angle, angle + arc); ctx.fill();
             ctx.strokeStyle = (i % 2 === 0) ? "#FF007F" : "#00F2FF";
             ctx.lineWidth = 10; ctx.stroke();
 
-            const sectorCenterAngle = startAngle + arc / 2 + currentAngleRad;
-            const normalizedAngle = Math.atan2(Math.sin(sectorCenterAngle), Math.cos(sectorCenterAngle));
-            const isUnderMarker = Math.abs(normalizedAngle + Math.PI/2) < (arc / 2);
+            const sectorCenter = angle + arc / 2 + currentAngle;
+            const norm = Math.atan2(Math.sin(sectorCenter), Math.cos(sectorCenter));
+            const active = Math.abs(norm + Math.PI/2) < (arc / 2);
 
-            if (isUnderMarker && i !== lastHighlightedIndex) {
-                lastHighlightedIndex = i;
-                if (isSpinning) playTick();
-            }
+            if (active && i !== lastTickIndex && isSpinning) { lastTickIndex = i; playTick(); }
 
             ctx.save();
-            ctx.translate(cx, cy); ctx.rotate(startAngle + arc / 2);
+            ctx.translate(cx, cy); ctx.rotate(angle + arc / 2);
             ctx.textAlign = "right"; ctx.textBaseline = "middle";
-            
-            if (isUnderMarker) {
-                ctx.fillStyle = "#FFFFFF"; ctx.font = "900 42px sans-serif";
-            } else {
-                ctx.fillStyle = "rgba(255, 255, 255, 0.2)"; ctx.font = "900 38px sans-serif";
-            }
-            ctx.fillText(p.name, r - 85, 0); ctx.restore();
+            ctx.fillStyle = active ? "#FFF" : "rgba(255,255,255,0.2)";
+            ctx.font = active ? "900 42px sans-serif" : "900 38px sans-serif";
+            ctx.fillText(p.name, r - 80, 0); ctx.restore();
         });
-
-        ctx.beginPath(); ctx.arc(600, 600, 75, 0, Math.PI*2);
-        ctx.fillStyle = "#000"; ctx.fill(); ctx.strokeStyle = "#FFF"; ctx.lineWidth = 6; ctx.stroke();
+        ctx.beginPath(); ctx.arc(600,600,70,0,Math.PI*2); ctx.fillStyle="#000"; ctx.fill();
     }
 
-    function loop() { draw(); requestAnimationFrame(loop); }
-    loop();
-
-    document.getElementById('exportCsv').onclick = () => {
-        const history = JSON.parse(localStorage.getItem('wheelHistory')) || [];
-        if(!history.length) return;
-        let csv = "\uFEFF№;Время;Приз\n";
-        history.forEach(h => csv += `${h.id};${h.time};${h.prize}\n`);
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `results.csv`; link.click();
-    };
-
-    document.getElementById('clearTable').onclick = () => {
-        if (confirm("Очистить историю?")) {
-            localStorage.removeItem('wheelHistory');
-            updateTable();
-        }
-    };
-
-    function updateTable() {
-        const history = JSON.parse(localStorage.getItem('wheelHistory')) || [];
-        const tbody = document.querySelector('#historyTable tbody');
-        tbody.innerHTML = history.slice().reverse().map(h => `<tr><td>${h.id}</td><td>${h.time}</td><td style="color:#FF007F;font-weight:bold">${h.prize}</td></tr>`).join('');
+    // Редактор функций
+    function showTab(tabId) {
+        document.getElementById('tab-editor').style.display = tabId === 'tab-editor' ? 'block' : 'none';
+        document.getElementById('tab-history').style.display = tabId === 'tab-history' ? 'block' : 'none';
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
     }
 
-    document.getElementById('openAdmin').onclick = () => { updateTable(); adminPanel.style.display = 'flex'; };
-    document.getElementById('closeAdmin').onclick = () => { adminPanel.style.display = 'none'; };
+    function addSectorRow(name = "", chance = 10) {
+        const div = document.createElement('div');
+        div.className = 'editor-row';
+        div.innerHTML = `
+            <input type="text" class="input-name sec-name" value="${name}" placeholder="Приз">
+            <input type="number" class="input-chance sec-chance" value="${chance}">
+            <button class="del-btn" onclick="this.parentElement.remove()">✕</button>
+        `;
+        document.getElementById('sectorsList').appendChild(div);
+    }
 
-    let totalRotation = 0;
+    function saveSettings() {
+        const newPrizes = [];
+        document.querySelectorAll('.editor-row').forEach(row => {
+            const n = row.querySelector('.sec-name')?.value;
+            const c = parseInt(row.querySelector('.sec-chance')?.value);
+            if (n) newPrizes.push({ name: n, chance: c });
+        });
+        currentData = {
+            mainTitle: document.getElementById('editMainTitle').value,
+            subTitle: document.getElementById('editSubTitle').value,
+            prizes: newPrizes
+        };
+        localStorage.setItem('wheelConfig', JSON.stringify(currentData));
+        alert("Настройки сохранены!");
+        draw();
+    }
+
+    function initEditor() {
+        document.getElementById('editMainTitle').value = currentData.mainTitle;
+        document.getElementById('editSubTitle').value = currentData.subTitle;
+        document.getElementById('sectorsList').innerHTML = "";
+        currentData.prizes.forEach(p => addSectorRow(p.name, p.chance));
+    }
+
+    document.getElementById('openAdmin').onclick = () => { initEditor(); document.getElementById('adminPanel').style.display = 'flex'; };
+    document.getElementById('closeAdmin').onclick = () => { document.getElementById('adminPanel').style.display = 'none'; };
+
     btn.onclick = () => {
         if (isSpinning) return;
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        
-        isSpinning = true; btn.disabled = true; resultLabel.style.display = 'none';
+        isSpinning = true; btn.disabled = true; document.getElementById('resultLabel').style.display = 'none';
 
-        const rand = Math.random() * 100;
-        let cumulative = 0; let winIdx = 0;
-        for (let i = 0; i < prizes.length; i++) {
-            cumulative += prizes[i].chance;
-            if (rand <= cumulative) { winIdx = i; break; }
+        // Логика шансов
+        const totalChance = currentData.prizes.reduce((sum, p) => sum + p.chance, 0);
+        let r = Math.random() * totalChance;
+        let winIdx = 0;
+        for (let i = 0; i < currentData.prizes.length; i++) {
+            r -= currentData.prizes[i].chance;
+            if (r <= 0) { winIdx = i; break; }
         }
 
-        const sectorStep = 360 / numSectors;
-        totalRotation += 3960 + (360 - (winIdx * sectorStep)) + (360 - (totalRotation % 360));
+        const step = 360 / currentData.prizes.length;
+        totalRotation += 3600 + (360 - (winIdx * step)) + (360 - (totalRotation % 360));
         canvas.style.transform = `rotate(${totalRotation}deg)`;
 
         setTimeout(() => {
             isSpinning = false; btn.disabled = false;
-            prizeSpan.textContent = prizes[winIdx].name;
-            resultLabel.style.display = 'block';
-            playWin();
+            document.getElementById('prizeName').textContent = currentData.prizes[winIdx].name;
+            document.getElementById('resultLabel').style.display = 'block';
+            
             const history = JSON.parse(localStorage.getItem('wheelHistory')) || [];
-            history.push({ id: history.length + 1, prize: prizes[winIdx].name, time: new Date().toLocaleTimeString('ru-RU') });
+            history.push({ id: history.length+1, prize: currentData.prizes[winIdx].name, time: new Date().toLocaleTimeString('ru-RU') });
             localStorage.setItem('wheelHistory', JSON.stringify(history));
         }, 6000);
     };
+
+    function loop() { draw(); requestAnimationFrame(loop); }
+    loop();
 </script>
 </body>
 </html>
