@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PAYG INSURE | КОЛЕСО УДАЧИ</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            background-color: #080808;
+            color: #FFFFFF;
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Эффект свечения фона */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80vmin;
+            height: 80vmin;
+            background: radial-gradient(circle, rgba(166, 215, 66, 0.15) 0%, rgba(8, 8, 8, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+            animation: glow-pulse 4s ease-in-out infinite;
+        }
+
+        @font-face {
+            font-family: 'Montserrat';
+            font-style: normal;
+            font-weight: 900;
+            src: local('Montserrat Black'), local('Montserrat-Black'), url(https://fonts.gstatic.com/s/montserrat/v25/JTURjIg1_i6t8kCHKm45_epG3gnD-w.woff2) format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Montserrat';
+            font-style: normal;
+            font-weight: 700;
+            src: local('Montserrat Bold'), local('Montserrat-Bold'), url(https://fonts.gstatic.com/s/montserrat/v25/JTURjIg1_i6t8kCHKm45_dJE3gnD-w.woff2) format('woff2');
+        }
+
+        /* Анимации */
+        @keyframes wheel-float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.02); }
+        }
+        
+        @keyframes btn-pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 0 30px rgba(166, 215, 66, 0.5), 0 0 60px rgba(166, 215, 66, 0.3);
+                border-color: #A6D742;
+            }
+            50% { 
+                transform: scale(1.05); 
+                box-shadow: 0 0 50px rgba(166, 215, 66, 0.8), 0 0 90px rgba(166, 215, 66, 0.5);
+                border-color: #ffffff;
+            }
+        }
+        
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        @keyframes marker-glow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(166, 215, 66, 0.8)); }
+            50% { filter: drop-shadow(0 0 20px rgba(166, 215, 66, 1)); }
+        }
+        
+        @keyframes prize-pop {
+            0% { transform: scale(0.8) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        
+        @keyframes prize-fade-out {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.8); }
+        }
+
+        .container {
+            position: relative;
+            text-align: center;
+            z-index: 10;
+            width: 100%;
+            max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 20px 30px;
+        }
+
+        .header {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 20;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            color: #FFFFFF;
+            margin: 0;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 30px rgba(166, 215, 66, 0.5);
+            position: relative;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #A6D742, transparent);
+            border-radius: 3px;
+        }
+
+        .header p {
+            font-size: 16px;
+            font-weight: 700;
+            color: #A6D742;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            margin: 15px 0 0;
+            text-shadow: 0 0 15px rgba(166, 215, 66, 0.5);
+        }
+
+        .wheel-outer {
+            position: relative;
+            width: min(75vmin, 550px);
+            height: min(75vmin, 550px);
+            margin: 30px auto 20px;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.8));
+            animation: wheel-float 5s ease-in-out infinite;
+        }
+
+        /* Внешнее свечение колеса */
+        .wheel-outer::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: radial-gradient(circle, rgba(166, 215, 66, 0.3) 0%, rgba(8, 8, 8, 0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: glow-pulse 4s ease-in-out infinite;
+        }
+
+        /* Лаймовая стрелка с улучшенным свечением */
+        .marker {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 22px solid transparent;
+            border-right: 22px solid transparent;
+            border-top: 44px solid #A6D742;
+            z-index: 30;
+            filter: drop-shadow(0 0 15px rgba(166, 215, 66, 0.9));
+            animation: marker-glow 2s ease-in-out infinite;
+        }
+
+        /* Тень под стрелкой */
+        .marker::after {
+            content: '';
+            position: absolute;
+            top: -44px;
+            left: -22px;
+            width: 44px;
+            height: 44px;
+            background: radial-gradient(circle, rgba(166, 215, 66, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+        }
+
+        canvas#wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: transform 6s cubic-bezier(0.1, 0, 0, 1);
+            box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.9), 0 0 0 2px rgba(166, 215, 66, 0.3), 0 0 20px rgba(166, 215, 66, 0.4);
+            border: 3px solid rgba(166, 215, 66, 0.5);
+        }
+
+        .spin-btn {
+            margin-top: 30px;
+            background: #080808;
+            color: #A6D742;
+            border: 2px solid #A6D742;
+            padding: 18px 60px;
+            font-size: 26px;
+            font-weight: 900;
+            border-radius: 60px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            box-shadow: 0 0 30px rgba(166, 215, 66, 0.4);
+            width: 100%;
+            max-width: 380px;
+            position: relative;
+            overflow: hidden;
+            animation: btn-pulse 3s infinite ease-in-out;
+            z-index: 20;
+        }
+
+        .spin-btn::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #A6D742, #ffffff, #A6D742);
+            border-radius: 60px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .spin-btn:hover::before {
+            opacity: 0.3;
+        }
+
+        .spin-btn:hover {
+            background: #A6D742;
+            color: #080808;
+            box-shadow: 0 0 50px rgba(166, 215, 66, 0.8);
+            transform: scale(1.02);
+            border-color: #ffffff;
+        }
+
+        .spin-btn:disabled {
+            opacity: 0.5;
+            border-color: #444;
+            color: #444;
+            background: #080808;
+            box-shadow: none;
+            animation: none;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        .spin-btn:disabled::before {
+            display: none;
+        }
+
+        /* Блок выигрыша */
+        .prize-block {
+            margin-top: 30px;
+            text-align: center;
+            width: 100%;
+            opacity: 0;
+            transform: scale(0.8) translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            position: relative;
+            z-index: 20;
+        }
+
+        .prize-block.show {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            animation: prize-pop 0.6s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+        }
+
+        .prize-block.hide {
+            opacity: 0;
+            transform: scale(0.8);
+            animation: prize-fade-out 0.5s ease forwards;
+        }
+
+        .prize-label {
+            font-size: 20px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 20px rgba(166, 215, 66, 0.5);
+        }
+
+        .prize-value {
+            font-size: 52px;
+            font-weight: 900;
+            color: #A6D742;
+            text-transform: uppercase;
+            text-shadow: 0 0 30px rgba(166, 215, 66, 0.8), 0 0 60px rgba(166, 215, 66, 0.4);
+            line-height: 1.2;
+            word-break: break-word;
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #A6D742 0%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 20px rgba(166, 215, 66, 0.5));
+        }
+
+        /* Окно регистрации */
+        #regOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(8, 8, 8, 0.98);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(15px);
+            opacity: 0;
+            transition: opacity 0.3s;
+            padding: 20px;
+        }
+
+        #regOverlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .reg-card {
+            background: linear-gradient(135deg, #1A1A1A 0%, #080808 100%);
+            padding: 45px 35px;
+            border-radius: 30px;
+            border: 1px solid rgba(166, 215, 66, 0.3);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(166, 215, 66, 0.2), 0 0 30px rgba(166, 215, 66, 0.2);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 32px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-btn:hover {
+            color: #A6D742;
+            background: rgba(166, 215, 66, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .reg-card h2 {
+            color: #A6D742;
+            font-size: 32px;
+            margin-bottom: 15px;
+            font-weight: 900;
+            text-shadow: 0 0 20px rgba(166, 215, 66, 0.5);
+        }
+
+        .reg-card p {
+            color: #FFFFFF;
+            opacity: 0.9;
+            margin-bottom: 35px;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .reg-card input {
+            background: #080808;
+            border: 1px solid #333;
+            color: #FFFFFF;
+            padding: 18px;
+            border-radius: 15px;
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .reg-card input:focus {
+            outline: none;
+            border-color: #A6D742;
+            box-shadow: 0 0 20px rgba(166, 215, 66, 0.3);
+        }
+
+        .reg-card input::placeholder {
+            color: #888;
+            opacity: 1;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #A6D742 0%, #8bbd38 100%);
+            color: #080808;
+            border: none;
+            width: 100%;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: 900;
+            border-radius: 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            font-family: 'Montserrat', sans-serif;
+            box-shadow: 0 0 30px rgba(166, 215, 66, 0.5);
+            margin-top: 10px;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 50px rgba(166, 215, 66, 0.8);
+        }
+
+        .confirm-btn:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 14px;
+            margin: -5px 0 15px;
+            display: none;
+            font-weight: 500;
+            text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+        }
+
+        /* Админка (стили без изменений, но добавлены для полноты) */
+        .admin-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid #333;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0.5;
+            z-index: 50;
+            fill: #A6D742;
+            transition: 0.3s;
+            padding: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .admin-trigger:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+            border-color: #A6D742;
+            box-shadow: 0 0 20px rgba(166, 215, 66, 0.5);
+        }
+
+        #adminPanel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #080808;
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .admin-card {
+            background: #1A1A1A;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+            width: 100%;
+        }
+
+        .admin-card h3 {
+            color: #A6D742;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .history-table th {
+            color: #A6D742;
+            font-weight: 700;
+            padding: 10px 5px;
+            text-align: left;
+            border-bottom: 2px solid #333;
+        }
+
+        .history-table td {
+            padding: 8px 5px;
+            border-bottom: 1px solid #222;
+            color: #FFFFFF;
+        }
+
+        .settings-group {
+            margin-bottom: 15px;
+        }
+
+        .settings-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #A6D742;
+            font-size: 14px;
+        }
+
+        .settings-group input,
+        .settings-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: #080808;
+            border: 1px solid #333;
+            color: #FFFFFF;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .prize-item {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            align-items: center;
+            background: #080808;
+            padding: 10px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .prize-item input[type="text"] {
+            flex: 2;
+            min-width: 120px;
+            background: #1A1A1A;
+            color: #FFFFFF;
+        }
+
+        .prize-item input[type="number"] {
+            flex: 1;
+            min-width: 70px;
+            background: #1A1A1A;
+            color: #FFFFFF;
+        }
+
+        .remove-prize {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .add-prize {
+            background: #A6D742;
+            color: #080808;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            font-weight: 700;
+        }
+
+        .export-btn {
+            background: #1A1A1A;
+            color: #A6D742;
+            border: 1px solid #A6D742;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            flex: 1;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .close-admin {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .close-admin:hover {
+            background: #444;
+        }
+    </style>
+</head>
+<body>
+
+<div id="regOverlay">
+    <div class="reg-card">
+        <button class="close-btn" onclick="closeRegistration()">×</button>
+        <h2>ПОЧТИ ГОТОВО!</h2>
+        <p>Введите данные для участия в розыгрыше</p>
+        <input type="text" id="uName" placeholder="Ваше ФИО">
+        <input type="tel" id="uPhone" placeholder="+7 (___) ___-__-__">
+        <div class="error-message" id="phoneError"></div>
+        <button class="confirm-btn" onclick="validateAndSpin()">КРУТИТЬ КОЛЕСО</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h1>PAYG INSURE</h1>
+        <p>SAFE MODE ACTIVATED</p>
+    </div>
+
+    <div class="wheel-outer" id="wheelCont">
+        <div class="marker"></div>
+        <canvas id="wheel" width="1200" height="1200"></canvas>
+    </div>
+
+    <button class="spin-btn" id="mainSpinBtn">КРУТИТЬ</button>
+
+    <div class="prize-block" id="prizeBlock">
+        <div class="prize-label">ВЫИГРЫШ</div>
+        <div class="prize-value" id="prizeDisplay">—</div>
+    </div>
+</div>
+
+<audio id="winAudio" preload="auto">
+    <source src="https://actions.google.com/sounds/v1/foley/brass_fanfare_short.ogg" type="audio/ogg">
+</audio>
+
+<audio id="confettiSound" preload="auto">
+    <source src="https://actions.google.com/sounds/v1/alarms/medium_bell_ringing_near.ogg" type="audio/ogg">
+</audio>
+
+<button class="admin-trigger" id="openAdmin">
+    <svg viewBox="0 0 24 24">
+        <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.35 19.43,11.03L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.47,5.34 14.86,5.12L14.47,2.44C14.43,2.2 14.22,2 14,2H10C9.78,2 9.57,2.2 9.53,2.44L9.14,5.12C8.53,5.34 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11.03C4.53,11.35 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.53,18.66 9.14,18.88L9.53,21.56C9.57,21.8 9.78,22 10,22H14C14.22,22 14.43,21.8 14.47,21.56L14.86,18.88C15.47,18.66 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/>
+    </svg>
+</button>
+
+<div id="adminPanel">
+    <h1 style="color:#A6D742; margin-bottom: 20px;">АДМИН-ПАНЕЛЬ</h1>
+
+    <div class="admin-card">
+        <h3>Настройка блоков</h3>
+        <div class="settings-group">
+            <label>Заголовок страницы</label>
+            <input type="text" id="pageTitle" value="PAYG INSURE">
+        </div>
+        <div class="settings-group">
+            <label>Подзаголовок</label>
+            <input type="text" id="pageSubtitle" value="SAFE MODE ACTIVATED">
+        </div>
+        <div class="settings-group">
+            <label>Текст на кнопке</label>
+            <input type="text" id="btnText" value="КРУТИТЬ">
+        </div>
+        <div class="settings-group">
+            <label>Заголовок окна</label>
+            <input type="text" id="regTitle" value="ПОЧТИ ГОТОВО!">
+        </div>
+        <div class="settings-group">
+            <label>Описание</label>
+            <textarea id="regDesc" rows="2">Введите данные для участия в розыгрыше</textarea>
+        </div>
+        <button class="confirm-btn" onclick="saveBlockSettings()">Сохранить</button>
+    </div>
+
+    <div class="admin-card">
+        <h3>Редактор секторов</h3>
+        <div id="prizeEditor"></div>
+        <button class="add-prize" onclick="addPrizeField()">+ Добавить сектор</button>
+        <button class="confirm-btn" onclick="savePrizes()" style="margin-top: 10px;">Сохранить</button>
+    </div>
+
+    <div class="admin-card">
+        <h3>База лидов</h3>
+        <div class="admin-actions">
+            <button class="export-btn" onclick="exportLeads()">CSV</button>
+            <button class="export-btn" onclick="exportLeads('json')">JSON</button>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="history-table" id="logTable">
+                <thead><tr><th>Имя</th><th>Телефон</th><th>Приз</th><th>Дата</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <button onclick="clearData()" style="background:#ff4444; color:#fff; border:none; padding:12px; border-radius:8px; margin-top:15px; width:100%;">Очистить</button>
+    </div>
+
+    <button class="close-admin" onclick="document.getElementById('adminPanel').style.display='none'">Закрыть</button>
+</div>
+
+<script>
+    const canvas = document.getElementById('wheel');
+    const ctx = canvas.getContext('2d');
+    const winAudio = document.getElementById('winAudio');
+    const confettiSound = document.getElementById('confettiSound');
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Цветовая палитра
+    const colors = {
+        background: '#080808',
+        lime: '#A6D742',
+        white: '#FFFFFF',
+        darkGray: '#1A1A1A'
+    };
+
+    let config = JSON.parse(localStorage.getItem('wheelConfig')) || {
+        prizes: [
+            { name: "ТЫЩА МИНУТ", chance: 1 },
+            { name: "СТИКЕРПАК", chance: 35 },
+            { name: "ПУТЬ ЗА НОЛЬ", chance: 25 },
+            { name: "ДВОЙНОЙ СЧЕТ", chance: 10 },
+            { name: "ТВОЙ АМУЛЕТ", chance: 2 },
+            { name: "ДРУЖСКИЙ СЕЙВ", chance: 7 },
+            { name: "ЕЩЕ КРУЖОК", chance: 5 },
+            { name: "ДЕНЬ БЕЗ ГРАНИЦ", chance: 15 }
+        ]
+    };
+
+    let blockSettings = JSON.parse(localStorage.getItem('blockSettings')) || {
+        pageTitle: "PAYG INSURE",
+        pageSubtitle: "SAFE MODE ACTIVATED",
+        btnText: "КРУТИТЬ",
+        regTitle: "ПОЧТИ ГОТОВО!",
+        regDesc: "Введите данные для участия в розыгрыше"
+    };
+
+    let isSpinning = false;
+    let totalRot = 0;
+    let lastIdx = -1;
+    let currentUser = null;
+    let prizeTimeout = null;
+
+    // Применение настроек блоков
+    function applyBlockSettings() {
+        document.querySelector('.header h1').textContent = blockSettings.pageTitle;
+        document.querySelector('.header p').textContent = blockSettings.pageSubtitle;
+        document.getElementById('mainSpinBtn').textContent = blockSettings.btnText;
+        document.querySelector('#regOverlay h2').textContent = blockSettings.regTitle;
+        document.querySelector('#regOverlay p').textContent = blockSettings.regDesc;
+    }
+
+    // Функция закрытия регистрационной формы
+    window.closeRegistration = () => {
+        const ov = document.getElementById('regOverlay');
+        ov.classList.remove('active');
+        setTimeout(() => {
+            ov.style.display = 'none';
+            document.getElementById('uName').value = '';
+            document.getElementById('uPhone').value = '';
+            document.getElementById('phoneError').style.display = 'none';
+        }, 300);
+    };
+
+    // Маска для телефона
+    document.getElementById('uPhone').addEventListener('input', function(e) {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+        e.target.value = !x[2] ? x[1] : '+7 (' + x[2] + ') ' + (x[3] ? x[3] + '-' : '') + (x[4] ? x[4] + '-' : '') + (x[5] ? x[5] : '');
+    });
+
+    // Проверка уникальности телефона
+    function isPhoneUnique(phone) {
+        const logs = JSON.parse(localStorage.getItem('wheelLogs')) || [];
+        const cleanPhone = phone.replace(/\D/g, '');
+        return !logs.some(log => log.phone.replace(/\D/g, '') === cleanPhone);
+    }
+
+    function playTick() {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(600, audioCtx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.04);
+        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.start();
+        o.stop(audioCtx.currentTime + 0.04);
+    }
+
+    function playConfettiSound() {
+        const sound = new Audio('https://actions.google.com/sounds/v1/alarms/medium_bell_ringing_near.ogg');
+        sound.volume = 0.3;
+        sound.play().catch(() => {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(400, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.5);
+        });
+    }
+
+    function hidePrizeAfterDelay() {
+        if (prizeTimeout) clearTimeout(prizeTimeout);
+
+        prizeTimeout = setTimeout(() => {
+            const prizeBlock = document.getElementById('prizeBlock');
+            prizeBlock.classList.remove('show');
+            prizeBlock.classList.add('hide');
+
+            setTimeout(() => {
+                document.getElementById('prizeDisplay').textContent = '—';
+                prizeBlock.classList.remove('hide');
+            }, 500);
+        }, 8000);
+    }
+
+    function draw() {
+        const cx = 600, cy = 600, r = 580;
+        ctx.clearRect(0, 0, 1200, 1200);
+
+        const arc = (2 * Math.PI) / config.prizes.length;
+        const matrix = new WebKitCSSMatrix(window.getComputedStyle(canvas).transform);
+        const currentAngleRad = Math.atan2(matrix.b, matrix.a);
+
+        // Рисуем внешнюю границу колеса с свечением
+        ctx.beginPath();
+        ctx.arc(cx, cy, r + 5, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(166, 215, 66, 0.3)';
+        ctx.lineWidth = 10;
+        ctx.stroke();
+
+        // Рисуем все секторы
+        for (let i = 0; i < config.prizes.length; i++) {
+            const start = i * arc - (Math.PI / 2) - (arc / 2);
+            const isLimeSector = (i % 2 === 0);
+            const sectorColor = isLimeSector ? colors.lime : colors.background;
+
+            ctx.beginPath();
+            ctx.fillStyle = sectorColor;
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, r, start, start + arc);
+            ctx.fill();
+
+            // Добавляем тонкую границу между секторами
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(166, 215, 66, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + Math.cos(start) * r, cy + Math.sin(start) * r);
+            ctx.stroke();
+        }
+
+        // Рисуем текст поверх секторов
+        for (let i = 0; i < config.prizes.length; i++) {
+            const start = i * arc - (Math.PI / 2) - (arc / 2);
+            const isLimeSector = (i % 2 === 0);
+            const p = config.prizes[i];
+
+            const centerAngle = start + arc / 2 + currentAngleRad;
+            const norm = Math.atan2(Math.sin(centerAngle), Math.cos(centerAngle));
+            const active = Math.abs(norm + Math.PI / 2) < (arc / 2);
+            
+            if (active && i !== lastIdx) {
+                lastIdx = i;
+                if (isSpinning) playTick();
+            }
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(start + arc / 2);
+            ctx.textAlign = "right";
+            ctx.textBaseline = "middle";
+
+            // Цвет текста: на лайме - черный, на черном - белый
+            ctx.fillStyle = isLimeSector ? colors.background : colors.white;
+
+            let fontSize = 38;
+            if (p.name.length > 10) fontSize = 32;
+            if (p.name.length > 14) fontSize = 28;
+            if (p.name.length > 18) fontSize = 24;
+
+            ctx.font = `900 ${fontSize}px 'Montserrat', sans-serif`;
+            
+            // Добавляем тень для текста
+            ctx.shadowColor = isLimeSector ? 'rgba(0, 0, 0, 0.3)' : 'rgba(166, 215, 66, 0.5)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            
+            ctx.fillText(p.name, r - 85, 0);
+            ctx.restore();
+        }
+
+        // Рисуем центр колеса (черный хаб) - без буквы F
+        ctx.beginPath();
+        ctx.fillStyle = colors.background;
+        ctx.arc(cx, cy, 70, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Добавляем свечение вокруг центра
+        ctx.beginPath();
+        ctx.arc(cx, cy, 75, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(166, 215, 66, 0.3)';
+        ctx.lineWidth = 5;
+        ctx.stroke();
+
+        // Внутреннее свечение
+        ctx.beginPath();
+        ctx.arc(cx, cy, 65, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(166, 215, 66, 0.2)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+    }
+
+    document.getElementById('mainSpinBtn').onclick = () => {
+        if (isSpinning) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const ov = document.getElementById('regOverlay');
+        ov.style.display = 'flex';
+        setTimeout(() => ov.classList.add('active'), 10);
+    };
+
+    function validateAndSpin() {
+        const name = document.getElementById('uName').value;
+        const phone = document.getElementById('uPhone').value;
+        const errorEl = document.getElementById('phoneError');
+
+        if (!name || !phone) {
+            errorEl.textContent = "Заполните все поля!";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        if (phone.replace(/\D/g, '').length !== 11) {
+            errorEl.textContent = "Некорректный телефон!";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        if (!isPhoneUnique(phone)) {
+            errorEl.textContent = "Вы уже участвовали!";
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        errorEl.style.display = 'none';
+        currentUser = { name, phone };
+        const ov = document.getElementById('regOverlay');
+        ov.classList.remove('active');
+        setTimeout(() => ov.style.display = 'none', 300);
+
+        startSpin();
+    }
+
+    function startSpin() {
+        isSpinning = true;
+        document.getElementById('mainSpinBtn').disabled = true;
+        document.getElementById('wheelCont').style.animation = 'none';
+
+        const prizeBlock = document.getElementById('prizeBlock');
+        prizeBlock.classList.remove('show', 'hide');
+
+        if (prizeTimeout) {
+            clearTimeout(prizeTimeout);
+            prizeTimeout = null;
+        }
+
+        document.getElementById('prizeDisplay').textContent = '—';
+
+        const totalChance = config.prizes.reduce((a, b) => a + b.chance, 0);
+        const rand = Math.random() * totalChance;
+        let cum = 0, winIdx = 0;
+        for (let i = 0; i < config.prizes.length; i++) {
+            cum += config.prizes[i].chance;
+            if (rand <= cum) {
+                winIdx = i;
+                break;
+            }
+        }
+
+        const step = 360 / config.prizes.length;
+        totalRot += 3960 + (360 - (winIdx * step)) + (360 - (totalRot % 360));
+        canvas.style.transform = `rotate(${totalRot}deg)`;
+
+        setTimeout(() => {
+            isSpinning = false;
+            document.getElementById('mainSpinBtn').disabled = false;
+            document.getElementById('wheelCont').style.animation = 'wheel-float 5s ease-in-out infinite';
+
+            const prize = config.prizes[winIdx].name;
+
+            document.getElementById('prizeDisplay').textContent = prize;
+            prizeBlock.classList.add('show');
+
+            hidePrizeAfterDelay();
+
+            winAudio.play().catch(() => {});
+            playConfettiSound();
+
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.6 },
+                colors: ['#A6D742', '#080808', '#FFFFFF']
+            });
+            setTimeout(() => {
+                confetti({ particleCount: 100, spread: 60, origin: { y: 0.5, x: 0.3 }, colors: ['#A6D742', '#080808'] });
+                confetti({ particleCount: 100, spread: 60, origin: { y: 0.5, x: 0.7 }, colors: ['#A6D742', '#080808'] });
+            }, 200);
+
+            const logs = JSON.parse(localStorage.getItem('wheelLogs')) || [];
+            logs.push({ ...currentUser, prize, time: new Date().toLocaleString() });
+            localStorage.setItem('wheelLogs', JSON.stringify(logs));
+
+            document.getElementById('uName').value = "";
+            document.getElementById('uPhone').value = "";
+        }, 6000);
+    }
+
+    // Админка
+    function renderPrizeEditor() {
+        const editor = document.getElementById('prizeEditor');
+        editor.innerHTML = '';
+        config.prizes.forEach((prize, index) => {
+            const div = document.createElement('div');
+            div.className = 'prize-item';
+            div.innerHTML = `
+                <input type="text" value="${prize.name}" placeholder="Название" data-index="${index}" data-field="name">
+                <input type="number" value="${prize.chance}" placeholder="Шанс" data-index="${index}" data-field="chance" min="0" step="0.1">
+                <button class="remove-prize" onclick="removePrize(${index})">×</button>
+            `;
+            editor.appendChild(div);
+        });
+    }
+
+    window.addPrizeField = () => {
+        config.prizes.push({ name: "НОВЫЙ ПРИЗ", chance: 1 });
+        renderPrizeEditor();
+    };
+
+    window.removePrize = (index) => {
+        config.prizes.splice(index, 1);
+        renderPrizeEditor();
+    };
+
+    window.savePrizes = () => {
+        const inputs = document.querySelectorAll('#prizeEditor input');
+        inputs.forEach(input => {
+            const index = input.dataset.index;
+            const field = input.dataset.field;
+            if (config.prizes[index]) {
+                config.prizes[index][field] = field === 'chance' ? parseFloat(input.value) || 0 : input.value;
+            }
+        });
+        localStorage.setItem('wheelConfig', JSON.stringify(config));
+        draw();
+        alert('Сектора сохранены!');
+    };
+
+    window.saveBlockSettings = () => {
+        blockSettings = {
+            pageTitle: document.getElementById('pageTitle').value,
+            pageSubtitle: document.getElementById('pageSubtitle').value,
+            btnText: document.getElementById('btnText').value,
+            regTitle: document.getElementById('regTitle').value,
+            regDesc: document.getElementById('regDesc').value
+        };
+        localStorage.setItem('blockSettings', JSON.stringify(blockSettings));
+        applyBlockSettings();
+        alert('Настройки блоков сохранены!');
+    };
+
+    // Функция экспорта базы лидов
+    window.exportLeads = (format = 'csv') => {
+        const logs = JSON.parse(localStorage.getItem('wheelLogs')) || [];
+
+        if (logs.length === 0) {
+            alert('Нет данных для экспорта');
+            return;
+        }
+
+        if (format === 'csv') {
+            const headers = ['Имя', 'Телефон', 'Приз', 'Дата'];
+            const csvContent = [
+                headers.join(';'),
+                ...logs.map(log => `${log.name};${log.phone};${log.prize};${log.time}`)
+            ].join('\n');
+
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.setAttribute('download', 'leads_export.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } else {
+            const jsonContent = JSON.stringify(logs, null, 2);
+            const blob = new Blob([jsonContent], { type: 'application/json' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.setAttribute('download', 'leads_export.json');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    };
+
+    function renderLogs() {
+        const logs = JSON.parse(localStorage.getItem('wheelLogs')) || [];
+        document.querySelector('#logTable tbody').innerHTML = logs.slice().reverse().map(l =>
+            `<tr><td>${l.name}</td><td>${l.phone}</td><td>${l.prize}</td><td>${l.time}</td></tr>`
+        ).join('');
+    }
+
+    document.getElementById('openAdmin').onclick = () => {
+        renderLogs();
+        renderPrizeEditor();
+        document.getElementById('pageTitle').value = blockSettings.pageTitle;
+        document.getElementById('pageSubtitle').value = blockSettings.pageSubtitle;
+        document.getElementById('btnText').value = blockSettings.btnText;
+        document.getElementById('regTitle').value = blockSettings.regTitle;
+        document.getElementById('regDesc').value = blockSettings.regDesc;
+        document.getElementById('adminPanel').style.display = 'flex';
+    };
+
+    window.clearData = () => {
+        if (confirm("Очистить базу лидов?")) {
+            localStorage.removeItem('wheelLogs');
+            renderLogs();
+        }
+    };
+
+    function loop() {
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    // Инициализация
+    applyBlockSettings();
+    loop();
+</script>
+</body>
+</html>
