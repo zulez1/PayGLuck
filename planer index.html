@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flame Planner 🔥</title>
+    
+    <!-- Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #030303;
+            color: white;
+            overflow-x: hidden;
+            position: relative;
+            width: 100%;
+        }
+
+        /* 🔥 АНИМИРОВАННЫЙ ФОН 🔥 */
+        .fire-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at 30% 30%, #442200, #110500, #030303);
+            animation: firePulse 10s ease-in-out infinite;
+        }
+
+        @keyframes firePulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.9; }
+        }
+
+        .fire-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .ember {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ff8800;
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: emberFloat 7s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes emberFloat {
+            0% { transform: translateY(100vh) scale(1); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.4; }
+            100% { transform: translateY(-100px) scale(0); opacity: 0; }
+        }
+
+        /* 🔥 ЯРКАЯ ПРИВЕТСТВЕННАЯ АНИМАЦИЯ 🔥 */
+        .splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #030303;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: splashFade 3.2s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes splashFade {
+            0% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        .splash-content {
+            text-align: center;
+            animation: contentPop 3.2s forwards;
+        }
+
+        @keyframes contentPop {
+            0% { transform: scale(0.2); opacity: 0; }
+            20% { transform: scale(1.3); opacity: 1; }
+            40% { transform: scale(1); opacity: 1; }
+            80% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+
+        .splash-flame {
+            font-size: 140px;
+            color: #ff8800;
+            text-shadow: 0 0 60px #ff4400, 0 0 120px #ff2200;
+            animation: flameBlaze 2s infinite alternate;
+        }
+
+        @keyframes flameBlaze {
+            from { text-shadow: 0 0 60px #ff8800, 0 0 120px #ff4400; transform: scale(1); }
+            to { text-shadow: 0 0 100px #ffaa00, 0 0 180px #ff6600; transform: scale(1.15); }
+        }
+
+        .splash-title {
+            margin-top: 20px;
+            font-size: 0;
+            color: #ffaa00;
+            font-weight: bold;
+            letter-spacing: 4px;
+            animation: titleBlast 2s 0.8s forwards;
+        }
+
+        @keyframes titleBlast {
+            0% { font-size: 0; opacity: 0; filter: blur(10px); }
+            50% { font-size: 52px; opacity: 1; filter: blur(0); text-shadow: 0 0 40px #ff8800; }
+            100% { font-size: 48px; opacity: 1; text-shadow: 0 0 30px #ff6600; }
+        }
+
+        /* 🔥 АНИМАЦИЯ ВЫПОЛНЕНИЯ ЗАДАЧИ 🔥 */
+        .task-complete-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .task-complete-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .complete-content {
+            text-align: center;
+            transform: scale(0);
+            animation: completePop 0.5s 0.1s forwards;
+        }
+
+        @keyframes completePop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .complete-flame {
+            font-size: 180px;
+            color: #ff8800;
+            text-shadow: 0 0 80px #ff4400, 0 0 150px #ff2200;
+            animation: completeFlame 1s infinite alternate;
+        }
+
+        @keyframes completeFlame {
+            from { text-shadow: 0 0 80px #ff8800, 0 0 150px #ff4400; transform: scale(1); }
+            to { text-shadow: 0 0 130px #ffaa00, 0 0 200px #ff6600; transform: scale(1.25); }
+        }
+
+        .complete-message {
+            margin-top: 30px;
+            font-size: 42px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 40px #ff6600, 0 0 80px #ff4400;
+            animation: messageGlow 1s infinite alternate;
+        }
+
+        @keyframes messageGlow {
+            from { text-shadow: 0 0 30px #ff8800; }
+            to { text-shadow: 0 0 60px #ffaa00, 0 0 30px #ff4400; }
+        }
+
+        /* 🔥 ОСНОВНОЙ ИНТЕРФЕЙС 🔥 */
+        .app {
+            max-width: 480px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 12px;
+            padding-bottom: 90px;
+            position: relative;
+            z-index: 10;
+            opacity: 0;
+            animation: appShow 0.5s 3s forwards;
+        }
+
+        @keyframes appShow {
+            to { opacity: 1; }
+        }
+
+        /* 🔥 ПЕРСОНАЖИ (ЯРКИЕ И КРАСИВЫЕ) 🔥 */
+        .flame-buddy {
+            position: fixed;
+            bottom: 15px;
+            width: 75px;
+            height: 75px;
+            z-index: 100;
+            cursor: pointer;
+            filter: drop-shadow(0 0 20px #ff4400);
+            animation: buddyFloat 3s ease-in-out infinite;
+        }
+
+        .flame-buddy.left {
+            left: 5px;
+        }
+
+        .flame-buddy.right {
+            right: 5px;
+        }
+
+        @keyframes buddyFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .buddy-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 15px #ff6600);
+            animation: buddyGlow 2s infinite alternate;
+        }
+
+        @keyframes buddyGlow {
+            from { filter: drop-shadow(0 0 15px #ff6600); }
+            to { filter: drop-shadow(0 0 30px #ffaa00); }
+        }
+
+        .buddy-speech {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 20, 0.95);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            white-space: nowrap;
+            border: 2px solid #ff6600;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            box-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
+        }
+
+        .flame-buddy:hover .buddy-speech {
+            opacity: 1;
+        }
+
+        /* 🔥 НАВИГАЦИЯ 🔥 */
+        .nav-bar {
+            display: flex;
+            gap: 6px;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 102, 0, 0.5);
+            border-radius: 30px;
+            padding: 5px;
+            margin-bottom: 12px;
+            position: sticky;
+            top: 8px;
+            z-index: 50;
+            width: 100%;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 9px 2px;
+            border-radius: 25px;
+            cursor: pointer;
+            color: #ffaa66;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #ff5500, #ffaa00);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 85, 0, 0.6);
+        }
+
+        /* 🔥 ВРЕМЯ 🔥 */
+        .time-card {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 102, 0, 0.5);
+            border-radius: 24px;
+            padding: 16px 14px;
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .time-display {
+            font-size: 48px;
+            font-weight: 800;
+            color: #ffaa00;
+            line-height: 1.1;
+            text-shadow: 0 0 15px #ff6600;
+            word-break: break-word;
+        }
+
+        .date-display {
+            font-size: 15px;
+            color: #ffaa66;
+            margin-top: 4px;
+            word-break: break-word;
+        }
+
+        .greeting-display {
+            font-size: 18px;
+            margin-top: 8px;
+            color: white;
+        }
+
+        /* 🔥 МОТИВАЦИЯ 🔥 */
+        .motivation-card {
+            background: linear-gradient(135deg, #552200, #884400);
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 12px;
+            text-align: center;
+            border: 1px solid #ff8800;
+            box-shadow: 0 0 20px rgba(255, 136, 0, 0.3);
+            width: 100%;
+        }
+
+        .quote-text {
+            font-size: 16px;
+            line-height: 1.4;
+            color: white;
+            font-weight: 500;
+        }
+
+        /* 🔥 СТАТИСТИКА 🔥 */
+        .stats-row {
+            display: flex;
+            gap: 8px;
+            margin: 12px 0;
+            width: 100%;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 102, 0, 0.5);
+            border-radius: 18px;
+            padding: 10px 3px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffaa00;
+            text-shadow: 0 0 10px #ff6600;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #ffaa66;
+            margin-top: 2px;
+        }
+
+        /* 🔥 ЗАГОЛОВКИ 🔥 */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 16px 0 10px;
+            width: 100%;
+        }
+
+        .section-icon {
+            font-size: 22px;
+            filter: drop-shadow(0 0 8px #ff6600);
+        }
+
+        .section-title {
+            font-size: 17px;
+            color: #ffaa00;
+            font-weight: 700;
+        }
+
+        .section-line {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, #ff6600, transparent);
+        }
+
+        /* 🔥 КАРТОЧКИ ЗАДАЧ 🔥 */
+        .task-item {
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 102, 0, 0.5);
+            border-radius: 18px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 8px;
+        }
+
+        .task-item.completed {
+            opacity: 0.5;
+        }
+
+        .task-item.completed .task-name {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+        .task-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffaa66;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .task-desc {
+            font-size: 11px;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .task-time {
+            color: #ffaa00;
+            font-size: 10px;
+            padding: 2px 6px;
+            background: rgba(255, 102, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .task-check {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #ff6600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            background: transparent;
+            color: transparent;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .task-check.checked {
+            background: #ff6600;
+            color: white;
+            box-shadow: 0 0 20px #ff6600;
+            transform: scale(1.1);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .delete-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #ff5555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #ff5555;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #ff5555;
+            color: white;
+        }
+
+        /* 🔥 КНОПКА ДОБАВЛЕНИЯ 🔥 */
+        .add-button {
+            background: linear-gradient(135deg, #552200, #884400);
+            color: white;
+            border: 1px solid #ff8800;
+            border-radius: 28px;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            width: 100%;
+            margin: 12px 0;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 136, 0, 0.3);
+            transition: all 0.2s;
+        }
+
+        .add-button:hover {
+            background: #663300;
+            box-shadow: 0 0 30px #ff8800;
+        }
+
+        /* 🔥 ФОРМА (ИСПРАВЛЕНО - НЕ ВЫЛЕЗАЕТ) 🔥 */
+        .task-form {
+            background: rgba(5, 5, 5, 0.98);
+            backdrop-filter: blur(10px);
+            border: 2px solid #ff6600;
+            border-radius: 24px;
+            padding: 16px 14px;
+            margin: 10px 0;
+            display: none;
+            width: 100%;
+            box-shadow: 0 0 30px rgba(255, 102, 0, 0.3);
+        }
+
+        .task-form.show {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            color: #ffaa66;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid rgba(255, 102, 0, 0.5);
+            border-radius: 16px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ffaa00;
+            box-shadow: 0 0 15px rgba(255, 170, 0, 0.3);
+        }
+
+        /* 🔥 КАСТОМНЫЙ ВЫБОР ПОВТОРЕНИЯ (ВСЕ 4 ВАРИАНТА + МЕСЯЦ) 🔥 */
+        .repeat-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 5px;
+            width: 100%;
+        }
+
+        .repeat-option {
+            flex: 1 0 calc(50% - 3px);
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid rgba(255, 102, 0, 0.5);
+            border-radius: 30px;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 13px;
+            color: #ffaa66;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .repeat-option.selected {
+            background: #ff6600;
+            color: white;
+            border-color: white;
+            box-shadow: 0 0 20px #ff6600;
+            transform: scale(1.02);
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 18px;
+            width: 100%;
+        }
+
+        .form-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-save {
+            background: #ff6600;
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
+        }
+
+        .btn-save:hover {
+            background: #ff8800;
+            box-shadow: 0 0 30px #ff8800;
+        }
+
+        .btn-cancel {
+            background: rgba(40, 40, 40, 0.9);
+            color: white;
+            border: 1px solid #ff6600;
+        }
+
+        .btn-cancel:hover {
+            background: #333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 25px;
+            color: #888;
+            font-size: 13px;
+            border: 2px dashed rgba(255, 102, 0, 0.3);
+            border-radius: 20px;
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        .empty-state span {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        .page {
+            display: none;
+            width: 100%;
+        }
+
+        .page.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Анимированный фон -->
+    <div class="fire-bg"></div>
+    <div class="fire-particles" id="particles"></div>
+
+    <!-- ЯРКАЯ приветственная анимация -->
+    <div class="splash">
+        <div class="splash-content">
+            <div class="splash-flame">🔥</div>
+            <div class="splash-title">FLAME PLANNER</div>
+        </div>
+    </div>
+
+    <!-- Анимация выполнения задачи -->
+    <div class="task-complete-overlay" id="taskCompleteOverlay">
+        <div class="complete-content">
+            <div class="complete-flame">🔥</div>
+            <div class="complete-message" id="completeMessage">СУПЕР!</div>
+        </div>
+    </div>
+
+    <!-- Персонажи (ЯРКИЕ) -->
+    <div class="flame-buddy left" onclick="buddySpeak('left')">
+        <div class="buddy-speech" id="speechLeft">Привет! 🔥</div>
+        <svg class="buddy-svg" viewBox="0 0 100 100">
+            <defs>
+                <radialGradient id="flameGrad" cx="40%" cy="40%" r="60%">
+                    <stop offset="0%" stop-color="#ffff00"/>
+                    <stop offset="50%" stop-color="#ff8800"/>
+                    <stop offset="100%" stop-color="#ff3300"/>
+                </radialGradient>
+            </defs>
+            <path d="M50 15 Q70 30 75 50 Q80 70 65 85 Q50 95 35 80 Q20 65 30 45 Q35 30 50 15" 
+                  fill="url(#flameGrad)">
+                <animate attributeName="d" dur="3s" repeatCount="indefinite"
+                         values="M50 15 Q70 30 75 50 Q80 70 65 85 Q50 95 35 80 Q20 65 30 45 Q35 30 50 15;
+                                M50 12 Q72 28 77 48 Q82 72 65 88 Q50 98 32 82 Q18 68 28 42 Q32 25 50 12;
+                                M50 15 Q70 30 75 50 Q80 70 65 85 Q50 95 35 80 Q20 65 30 45 Q35 30 50 15"/>
+            </path>
+            <circle cx="35" cy="45" r="7" fill="white"/>
+            <circle cx="65" cy="45" r="7" fill="white"/>
+            <circle cx="38" cy="43" r="3" fill="black"/>
+            <circle cx="68" cy="43" r="3" fill="black"/>
+            <path d="M40 65 Q50 75 60 65" stroke="white" stroke-width="4" fill="none"/>
+        </svg>
+    </div>
+
+    <div class="flame-buddy right" onclick="buddySpeak('right')">
+        <div class="buddy-speech" id="speechRight">Погнали! 💪</div>
+        <svg class="buddy-svg" viewBox="0 0 100 100">
+            <path d="M50 15 Q70 30 75 50 Q80 70 65 85 Q50 95 35 80 Q20 65 30 45 Q35 30 50 15" 
+                  fill="url(#flameGrad)">
+                <animate attributeName="d" dur="2.8s" repeatCount="indefinite"
+                         values="M50 15 Q70 30 75 50 Q80 70 65 85 Q50 95 35 80 Q20 65 30 45 Q35 30 50 15;
+                                M50 18 Q68 32 73 52 Q78 68 63 73 Q48 92 33 78 Q22 63 32 43 Q37 28 50 18;
+                                M50 15 Q70 30 75 50 Q80 70 65 85 Q50 95 35 80 Q20 65 30 45 Q35 30 50 15"/>
+            </path>
+            <circle cx="35" cy="45" r="7" fill="white"/>
+            <circle cx="65" cy="45" r="7" fill="white"/>
+            <circle cx="38" cy="43" r="3" fill="black"/>
+            <circle cx="68" cy="43" r="3" fill="black"/>
+            <path d="M40 65 Q50 75 60 65" stroke="white" stroke-width="4" fill="none"/>
+        </svg>
+    </div>
+
+    <!-- Основное приложение -->
+    <div class="app" id="app">
+        <!-- Навигация -->
+        <div class="nav-bar">
+            <div class="nav-item active" onclick="switchPage('home', this)">🏠 Главная</div>
+            <div class="nav-item" onclick="switchPage('habits', this)">🔥 Привычки</div>
+            <div class="nav-item" onclick="switchPage('plans', this)">📅 Планы</div>
+        </div>
+
+        <!-- ГЛАВНАЯ -->
+        <div class="page active" id="home">
+            <div class="time-card">
+                <div class="time-display" id="currentTime"></div>
+                <div class="date-display" id="currentDate"></div>
+                <div class="greeting-display" id="greeting"></div>
+            </div>
+
+            <div class="motivation-card">
+                <div class="quote-text" id="quote">Загрузка...</div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-box"><div class="stat-number" id="totalCount">0</div><div class="stat-label">Всего</div></div>
+                <div class="stat-box"><div class="stat-number" id="doneCount">0</div><div class="stat-label">Готово</div></div>
+                <div class="stat-box"><div class="stat-number" id="streakCount">0</div><div class="stat-label">Дней</div></div>
+            </div>
+
+            <div class="section-header"><span class="section-icon">🔥</span><span class="section-title">На сегодня</span><div class="section-line"></div></div>
+            <div id="todayTasks"></div>
+        </div>
+
+        <!-- ПРИВЫЧКИ -->
+        <div class="page" id="habits">
+            <div class="section-header"><span class="section-icon">🔥</span><span class="section-title">Привычки</span><div class="section-line"></div></div>
+            <div id="habitsList"></div>
+            <button class="add-button" onclick="showForm('habit')">+ Добавить привычку</button>
+        </div>
+
+        <!-- ПЛАНЫ -->
+        <div class="page" id="plans">
+            <div class="section-header"><span class="section-icon">📅</span><span class="section-title">Планы</span><div class="section-line"></div></div>
+            <div id="plansList"></div>
+            <button class="add-button" onclick="showForm('plan')">+ Добавить план</button>
+        </div>
+
+        <!-- ФОРМА (ИСПРАВЛЕНА) -->
+        <div class="task-form" id="taskForm">
+            <div class="form-group"><label>Название</label><input type="text" id="taskName" placeholder="Например: Зарядка" maxlength="30"></div>
+            <div class="form-group"><label>Описание</label><input type="text" id="taskDesc" placeholder="Необязательно" maxlength="50"></div>
+            <div class="form-group" id="dateGroup"><label>Дата</label><input type="date" id="taskDate"></div>
+            <div class="form-group"><label>Время</label><input type="time" id="taskTime" value="12:00"></div>
+            
+            <!-- КАСТОМНЫЙ ВЫБОР ПОВТОРЕНИЯ (5 ВАРИАНТОВ) -->
+            <div class="form-group" id="repeatGroup">
+                <label>Повторять</label>
+                <div class="repeat-selector" id="repeatSelector">
+                    <div class="repeat-option" data-value="none" onclick="selectRepeat('none')">🚫 Нет</div>
+                    <div class="repeat-option selected" data-value="daily" onclick="selectRepeat('daily')">📆 Каждый день</div>
+                    <div class="repeat-option" data-value="3days" onclick="selectRepeat('3days')">🔄 Каждые 3 дня</div>
+                    <div class="repeat-option" data-value="weekly" onclick="selectRepeat('weekly')">📅 Каждую неделю</div>
+                    <div class="repeat-option" data-value="monthly" onclick="selectRepeat('monthly')">📆 Каждый месяц</div>
+                </div>
+            </div>
+
+            <div class="form-buttons">
+                <button class="btn-cancel" onclick="hideForm()">Отмена</button>
+                <button class="btn-save" onclick="saveTask()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Telegram
+        let tg = window.Telegram?.WebApp;
+        if (tg) { tg.expand(); tg.ready(); }
+
+        // Данные
+        let habits = JSON.parse(localStorage.getItem('habits')) || [
+            { id: 1, name: 'Зарядка', desc: '15 минут', done: false, time: '08:00', repeat: 'daily' },
+            { id: 2, name: 'Чтение', desc: '10 страниц', done: false, time: '22:00', repeat: 'daily' }
+        ];
+        let plans = JSON.parse(localStorage.getItem('plans')) || [];
+        let streak = parseInt(localStorage.getItem('streak')) || 0;
+        let lastDoneDate = localStorage.getItem('lastDone') || '';
+        let currentType = 'habit';
+        let currentRepeat = 'daily';
+
+        let quotes = ['🔥 Ты можешь всё!', '💪 Маленькие шаги = победа', '✨ Каждый день - шанс', '🌟 Верь в себя!', '⚡ Зажги пламя!'];
+        let successMsgs = ['СУПЕР!', 'КЛАССНО!', 'ВПЕРЁД!', 'ОГОНЬ!', 'КРУТО!', 'ДА!', '🔥', 'ТЫ КРУТ!'];
+
+        // Частицы
+        for (let i = 0; i < 20; i++) {
+            let p = document.createElement('div');
+            p.className = 'ember';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDelay = Math.random() * 5 + 's';
+            p.style.background = `rgb(255, ${100 + Math.random() * 155}, 0)`;
+            document.querySelector('.fire-particles').appendChild(p);
+        }
+
+        // Время
+        function updateTime() {
+            let now = new Date();
+            document.getElementById('currentTime').innerText = 
+                `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            document.getElementById('currentDate').innerText = 
+                now.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' });
+            let h = now.getHours();
+            document.getElementById('greeting').innerText = h < 12 ? 'Доброе утро!' : h < 18 ? 'Добрый день!' : 'Добрый вечер!';
+        }
+
+        // Цитата
+        function updateQuote() {
+            document.getElementById('quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+        }
+
+        // Персонажи
+        function buddySpeak(side) {
+            let msgs = ['🔥 Круто!', '💪 Давай!', '✨ Верю!', '🌟 Ты сможешь!'];
+            let bubble = document.getElementById(side === 'left' ? 'speechLeft' : 'speechRight');
+            bubble.innerText = msgs[Math.floor(Math.random() * msgs.length)];
+            bubble.style.opacity = '1';
+            setTimeout(() => bubble.style.opacity = '0', 1200);
+        }
+
+        // Анимация выполнения
+        function showCompleteAnimation() {
+            document.getElementById('completeMessage').innerText = successMsgs[Math.floor(Math.random() * successMsgs.length)];
+            document.getElementById('taskCompleteOverlay').classList.add('show');
+            setTimeout(() => document.getElementById('taskCompleteOverlay').classList.remove('show'), 1300);
+        }
+
+        // Выбор повторения
+        function selectRepeat(value) {
+            currentRepeat = value;
+            document.querySelectorAll('.repeat-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.value === value);
+            });
+        }
+
+        // Отрисовка
+        function renderHabits() {
+            let html = '';
+            habits.forEach(h => {
+                html += `<div class="task-item ${h.done ? 'completed' : ''}">
+                    <div class="task-info"><div class="task-name">${h.name}</div>
+                    <div class="task-desc"><span>${h.desc || ''}</span><span class="task-time">${h.time || ''}</span></div></div>
+                    <div class="task-actions">
+                        <div class="task-check ${h.done ? 'checked' : ''}" onclick="toggleTask('habit', ${h.id})">${h.done ? '✓' : ''}</div>
+                        <div class="delete-btn" onclick="deleteTask('habit', ${h.id})">✕</div>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('habitsList').innerHTML = html || '<div class="empty-state"><span>🔥</span>Нет привычек</div>';
+        }
+
+        function renderPlans() {
+            let html = '';
+            plans.forEach(p => {
+                html += `<div class="task-item ${p.done ? 'completed' : ''}">
+                    <div class="task-info"><div class="task-name">${p.name}</div>
+                    <div class="task-desc"><span>${p.desc || ''}</span><span class="task-time">${p.date || ''} ${p.time || ''}</span></div></div>
+                    <div class="task-actions">
+                        <div class="task-check ${p.done ? 'checked' : ''}" onclick="toggleTask('plan', ${p.id})">${p.done ? '✓' : ''}</div>
+                        <div class="delete-btn" onclick="deleteTask('plan', ${p.id})">✕</div>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('plansList').innerHTML = html || '<div class="empty-state"><span>📅</span>Нет планов</div>';
+        }
+
+        function renderToday() {
+            let today = new Date().toISOString().split('T')[0];
+            let todayPlans = plans.filter(p => p.date === today && !p.done).slice(0, 3);
+            let todayHabits = habits.filter(h => !h.done).slice(0, 3);
+            let all = [...todayPlans, ...todayHabits];
+            let html = '';
+            all.forEach(t => {
+                html += `<div class="task-item"><div class="task-info"><div class="task-name">${t.name}</div>
+                <div class="task-desc">${t.desc || ''} ${t.time ? `<span class="task-time">${t.time}</span>` : ''}</div></div></div>`;
+            });
+            document.getElementById('todayTasks').innerHTML = html || '<div class="empty-state"><span>✨</span>На сегодня всё</div>';
+        }
+
+        function updateStats() {
+            let total = habits.length + plans.length;
+            let done = habits.filter(h => h.done).length + plans.filter(p => p.done).length;
+            document.getElementById('totalCount').innerText = total;
+            document.getElementById('doneCount').innerText = done;
+            document.getElementById('streakCount').innerText = streak;
+        }
+
+        // Действия
+        function toggleTask(type, id) {
+            let list = type === 'habit' ? habits : plans;
+            let task = list.find(t => t.id === id);
+            if (task) {
+                task.done = !task.done;
+                if (task.done) {
+                    let today = new Date().toDateString();
+                    if (lastDoneDate !== today) { streak++; lastDoneDate = today; localStorage.setItem('streak', streak); localStorage.setItem('lastDone', today); }
+                    showCompleteAnimation();
+                    buddySpeak(Math.random() > 0.5 ? 'left' : 'right');
+                }
+                localStorage.setItem(type + 's', JSON.stringify(list));
+                renderAll();
+            }
+        }
+
+        function deleteTask(type, id) {
+            if (confirm('Удалить задачу?')) {
+                let list = type === 'habit' ? habits : plans;
+                let index = list.findIndex(t => t.id === id);
+                if (index !== -1) { list.splice(index, 1); localStorage.setItem(type + 's', JSON.stringify(list)); renderAll(); }
+            }
+        }
+
+        // Форма
+        function showForm(type) {
+            currentType = type;
+            document.getElementById('repeatGroup').style.display = type === 'habit' ? 'block' : 'none';
+            document.getElementById('dateGroup').style.display = type === 'plan' ? 'block' : 'none';
+            let today = new Date().toISOString().split('T')[0];
+            document.getElementById('taskDate').value = today;
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskDesc').value = '';
+            currentRepeat = 'daily';
+            document.querySelectorAll('.repeat-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.value === 'daily');
+            });
+            document.getElementById('taskForm').classList.add('show');
+        }
+
+        function hideForm() {
+            document.getElementById('taskForm').classList.remove('show');
+        }
+
+        function saveTask() {
+            let name = document.getElementById('taskName').value.trim();
+            if (!name) return alert('Введите название');
+            let task = {
+                id: Date.now(),
+                name: name.substring(0, 30),
+                desc: document.getElementById('taskDesc').value.substring(0, 50),
+                time: document.getElementById('taskTime').value,
+                done: false
+            };
+            if (currentType === 'habit') {
+                task.repeat = currentRepeat;
+                habits.push(task);
+                localStorage.setItem('habits', JSON.stringify(habits));
+            } else {
+                task.date = document.getElementById('taskDate').value;
+                plans.push(task);
+                localStorage.setItem('plans', JSON.stringify(plans));
+            }
+            hideForm();
+            renderAll();
+            if (tg) tg.showPopup({ message: '✅ Добавлено' });
+            buddySpeak('right');
+        }
+
+        // Навигация
+        function switchPage(page, el) {
+            document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(page).classList.add('active');
+        }
+
+        function renderAll() { renderHabits(); renderPlans(); renderToday(); updateStats(); }
+
+        // Запуск
+        updateTime(); updateQuote(); renderAll();
+        setInterval(updateTime, 1000);
+        setInterval(updateQuote, 10000);
+    </script>
+</body>
+</html>
